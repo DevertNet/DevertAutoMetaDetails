@@ -5,25 +5,13 @@
         <title>Home Breadcrumb and Rich Snippets</title>
         <title lang="de-DE">Startseite in Breadcrumb und Rich Snippets</title>
 
-        <input-field type="bool">
-            <name>homeActive</name>
-            <label>Show Home Name in Breadcrumb?</label>
-            <label lang="de-DE">Sartseiten Name in Breadcrumb anzeigen?</label>
-            <defaultValue>1</defaultValue>
-        </input-field>
-
-        <input-field type="text">
-            <name>homename</name>
-            <label>Home Name in Breadcrumb</label>
-            <label lang="de-DE">Sartseiten Name in Breadcrumb</label>
-            <defaultValue>Home</defaultValue>
-        </input-field>
-
-        <input-field type="bool">
-            <name>hideBreadcrumb</name>
-            <label>Hide Breadcrumb? (Rich snippets stay)</label>
-            <label lang="de-DE">Breadcrumb verstecken? (Rich Snippets bleiben)</label>
-            <defaultValue>0</defaultValue>
+        <input-field type="textarea">
+            <name>productTitlePhrases</name>
+            <label>Product Meta Title Phrases</label>
+            <label lang="de-DE">Produkt Meta Titel Phrasen</label>
+            <helpText>One phrase per line. Will be rendered as twig template.</helpText>
+            <helpText lang="de-DE">Eine Phrase pro Zeile. Inhalt wird als Twig-Template gerendert.</helpText>
+            <defaultValue></defaultValue>
         </input-field>
     </card>
 </config>

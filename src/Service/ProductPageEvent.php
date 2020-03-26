@@ -6,14 +6,17 @@ use Shopware\Storefront\Page\Product\ProductPageLoadedEvent;
 use Shopware\Core\Content\Product\ProductEvents;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 use Twig\Loader\ArrayLoader;
+use Devert\AutoMetaDetails\Helper\General;
 
 class ProductPageEvent implements EventSubscriberInterface
 {
     public $twig;
+    public $helper;
 
-    public function __construct($twig)
+    public function __construct($twig, General $helper)
     {
         $this->twig = $twig;
+        $this->helper = $helper;
     }
 
     public static function getSubscribedEvents(): array
@@ -42,7 +45,13 @@ class ProductPageEvent implements EventSubscriberInterface
             return;
         }
 
-        $new_meta_title = 'aaas {{ name|slice(0, 10) }} {{ page.product.productnumber }} dasdasdasdasd';
+        //https://docs.shopware.com/en/shopware-platform-dev-en/how-to/reading-plugin-config
+        $phrases = array(
+            'aaas {{ name|slice(0, 10) }} {{ page.product.productnumber }} dasdasdasdasd'
+        );
+
+        //get phrase for this product id
+        $new_meta_title = $this->helper->getPhrase($phrases, $page->getProduct()->getAutoIncrement());
         
         //options
         $vars = array(
