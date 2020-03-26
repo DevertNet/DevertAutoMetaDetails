@@ -1,0 +1,62 @@
+{% extends '@Storefront/storefront/component/listing/breadcrumb.html.twig' %}
+
+{% block component_listing_breadcrumb %}
+    {% set breadcrumb = category.buildSeoBreadcrumb(context.salesChannel.navigationCategoryId) %}
+
+    {% block component_listing_breadcrumb_richsnippet %}
+        {% set position = 1 %}
+        {# seperating this in single blocks does not work, because of the scope of variable, blocks etc... #}
+        {% if breadcrumb %}
+            <script type="application/ld+json">
+                {
+                    "@context": "https://schema.org",
+                    "@type": "BreadcrumbList",
+                    "itemListElement": [
+                        {% if shopware.config.DevertRichSnippets.config.homeActive %}
+                            {
+                                "@type": "ListItem",
+                                "position": {{ position }},
+                                "name": "{{ shopware.config.DevertRichSnippets.config.homename }}",
+                                "item": "{{ absolute_url(path('frontend.home.page')) }}"
+                            },
+                            {% set position = position + 1 %}
+                        {% endif %}
+                        {% for key, item in breadcrumb %}
+                            {
+                                "@type": "ListItem",
+                                "position": {{ position }},
+                                "name": "{{ item }}"{% if item != breadcrumb|last %},
+                                "item": "{{ seoUrl('frontend.navigation.page', { navigationId: key }) }}"{% endif %}
+                            }{% if item != breadcrumb|last %},
+                            {% endif %}
+                            {% set position = position + 1 %}
+                        {% endfor %}
+                    ]
+                }
+            </script>
+        {% endif %}
+    {% endblock %}
+
+    {% block component_listing_breadcrumb_home %}
+        {% if breadcrumb and shopware.config.DevertRichSnippets.config.homeActive and shopware.config.DevertRichSnippets.config.hideBreadcrumb!=1 %}
+            <div class="breadcrumb-container">
+                {% block component_listing_breadcrumb_link_home %}
+                    <a href="{{ path('frontend.home.page') }}">
+                        {% block component_listing_breadcrumb_link_name_home %}
+                            {{ shopware.config.DevertRichSnippets.config.homename }}
+                        {% endblock %}
+                    </a>
+                {% endblock %}
+                {% block component_listing_breadcrumb_placeholder_home %}
+                    <div class="breadcrumb-placeholder">
+                        {% sw_icon 'arrow-medium-right' style { 'size': 'fluid', 'pack': 'solid'} %}
+                    </div>
+                {% endblock %}
+            </div>
+        {% endif %}
+    {% endblock %}
+
+    {% if shopware.config.DevertRichSnippets.config.hideBreadcrumb!=1 %}
+        {{ parent() }}
+    {% endif %}
+{% endblock %}

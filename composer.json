@@ -1,0 +1,44 @@
+{
+  "name": "devert/autometadetails",
+  "description": "Automatic meta details for products and categories.",
+  "version": "1.0.0",
+  "type": "shopware-platform-plugin",
+  "license": "proprietary",
+  "authors": [
+    {
+        "name": "devert.net Leon Weickert",
+        "role": "Manufacturer",
+        "homepage": "https://devert.net"
+    }
+  ],
+  "require": {
+    "shopware/core": "6.1.*",
+    "shopware/storefront": "6.1.*"
+  },
+  "autoload": {
+    "psr-4": {
+      "Devert\\AutoMetaDetails\\": "src/"
+    }
+  },
+  "extra": {
+    "shopware-plugin-class": "Devert\\AutoMetaDetails\\DevertAutoMetaDetails",
+    "plugin-icon": "src/Resources/config/plugin.png",
+    "copyright": "(c) by Leon Weickert",
+    "label": {
+      "de-DE": "Devert | Automatische Meta Details",
+      "en-GB": "Devert | Automatic meta details"
+    },
+    "description": {
+      "de-DE": "Devert | Automatische Meta Details",
+      "en-GB": "Devert | Automatic meta details"
+    },
+    "manufacturerLink": {
+        "de-DE": "https://devert.net",
+        "en-GB": "https://devert.net"
+    },
+    "supportLink": {
+        "de-DE": "https://devert.net",
+        "en-GB": "https://devert.net"
+    }
+  }
+}
