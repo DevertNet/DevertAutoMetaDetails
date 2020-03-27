@@ -1,21 +1,24 @@
 <?php declare(strict_types=1);
 
 namespace Devert\AutoMetaDetails\Service;
-use Shopware\Core\Framework\DataAbstractionLayer\Event\EntityLoadedEvent;
-use Shopware\Storefront\Page\Product\ProductPageLoadedEvent;
-use Shopware\Core\Content\Product\ProductEvents;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
-use Twig\Loader\ArrayLoader;
+use Shopware\Storefront\Page\Product\ProductPageLoadedEvent;
 use Devert\AutoMetaDetails\Helper\General;
 
 class ProductPageEvent implements EventSubscriberInterface
 {
-    public $twig;
+    /**
+     * @var General
+     */
     public $helper;
 
-    public function __construct($twig, General $helper)
+    /**
+     * @var string
+     */
+    public $entity_name = 'product';
+
+    public function __construct(General $helper)
     {
-        $this->twig = $twig;
         $this->helper = $helper;
     }
 
@@ -30,46 +33,103 @@ class ProductPageEvent implements EventSubscriberInterface
     {
         $page = $event->getPage();
         $context = $event->getContext();
+        $sales_channel_context = $event->getSalesChannelContext();
 
         //change meta title
-        $this->setMetaTitle($page, $context);
+        $this->setMetaTitle($page, $context, $sales_channel_context);
+
+        //change meta description
+        $this->setMetaDescription($page, $context, $sales_channel_context);
+
+        //bug fix for empty description (e.g. sw6.1.3)
+        $metaInformation = $page->getMetaInformation();
+        if(!$metaInformation->getMetaTitle())
+        {
+            $metaInformation->setMetaTitle((string) $page->getProduct()->getTranslation('name'));
+        }
+        if(!$metaInformation->getMetaDescription())
+        {
+            $metaInformation->setMetaDescription((string) $page->getProduct()->getTranslation('description'));
+        }
+        
     }
 
-    public function setMetaTitle($page, $context)
+    public function setMetaTitle($page, $context, $sales_channel_context)
     {
-        $meta_information = $page->getMetaInformation();
-
-        //if product has custom meta title use it
-        if ((string) $page->getProduct()->getMetaTitle() !== '') {
+        $metaInformation = $page->getMetaInformation();
+        
+        //if product has custom meta title use it and allowed
+        if ((string) $page->getProduct()->getMetaTitle() !== '' && $this->helper->getSystemConfig('DevertAutoMetaDetails.config.' . $this->entity_name . 'AllowIndividualMetaData')) {
             $metaInformation->setMetaTitle((string) $page->getProduct()->getMetaTitle());
             return;
         }
 
-        //https://docs.shopware.com/en/shopware-platform-dev-en/how-to/reading-plugin-config
-        $phrases = array(
-            'aaas {{ name|slice(0, 10) }} {{ page.product.productnumber }} dasdasdasdasd'
-        );
+        //get phrases from config
+        $phrases = $this->helper->getTitlePhrases($this->entity_name, $page);
+
+        //check if there are phrases
+        if(!$phrases)
+        {
+            return;
+        }
+
+        //debug
+        //$phrases = array('aaas {{ name|slice(0, 10) }} {{ page.product.productnumber }} {{ context.salesChannel.name }} dasdasdasdasd');
 
         //get phrase for this product id
         $new_meta_title = $this->helper->getPhrase($phrases, $page->getProduct()->getAutoIncrement());
         
-        //options
-        $vars = array(
-            'name' => $page->getProduct()->getTranslation('name'),
-            'page' => $page
-        );
-
         //render meta title
-        $twig = $this->twig;
-        $originalLoader = $twig->getLoader();
-        $twig->setLoader(new ArrayLoader([
-            'product_meta_title_tmp.html.twig' => $new_meta_title,
-        ]));
-        $output = $twig->render('product_meta_title_tmp.html.twig', $vars);
+        //$this->templateRenderer->enableTestMode();
+        $output = $this->helper->getTemplateRenderer()->render($new_meta_title, $this->getTemplateVariables($page, $sales_channel_context), $context);
 
         //set meta title
-        $meta_information->setMetaTitle($output);
-        var_dump($output);
-        die;
+        $metaInformation->setMetaTitle($output);
+    }
+
+    public function setMetaDescription($page, $context, $sales_channel_context)
+    {
+        $metaInformation = $page->getMetaInformation();
+        
+        //if product has custom meta title use it and allowed
+        if ((string) $page->getProduct()->getMetaDescription() !== '' && $this->helper->getSystemConfig('DevertAutoMetaDetails.config.' . $this->entity_name . 'AllowIndividualMetaData')) {
+            $metaInformation->setMetaDescription((string) $page->getProduct()->getMetaDescription());
+            return;
+        }
+
+        //get phrases from config
+        $phrases = $this->helper->getDescriptionPhrases($this->entity_name, $page);
+
+        //check if there are phrases
+        if(!$phrases)
+        {
+            return;
+        }
+
+        //debug
+        //$phrases = array('aaas {{ name|slice(0, 10) }} {{ page.product.productnumber }} {{ context.salesChannel.name }} dasdasdasdasd');
+
+        //get phrase for this product id
+        $new_meta_description = $this->helper->getPhrase($phrases, $page->getProduct()->getAutoIncrement());
+        
+        //render meta title
+        //$this->templateRenderer->enableTestMode();
+        $output = $this->helper->getTemplateRenderer()->render($new_meta_description, $this->getTemplateVariables($page, $sales_channel_context), $context);
+
+        //set meta title
+        if($output)
+        {
+            $metaInformation->setMetaDescription($output);
+        }
+    }
+
+    public function getTemplateVariables($page, $sales_channel_context)
+    {
+        return array(
+            'name' => $page->getProduct()->getTranslation('name'),
+            'description' => $page->getProduct()->getTranslation('description'),
+            'page' => $page,
+            'context' => $sales_channel_context,
+        );
     }
 }

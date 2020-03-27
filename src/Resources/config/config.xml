@@ -5,13 +5,32 @@
         <title>Home Breadcrumb and Rich Snippets</title>
         <title lang="de-DE">Startseite in Breadcrumb und Rich Snippets</title>
 
+        <input-field type="bool">
+            <name>productAllowIndividualMetaData</name>
+            <label>Products: Use individual meta data, if available? </label>
+            <label lang="de-DE">Produkte: Individuelle Meta Angaben nutzen, wenn gepflegt?</label>
+            <helpText>If meta data (title or description) are filed for a product, these are used instead of the phrases.</helpText>
+            <helpText lang="de-DE">Wenn bei einem Produkt Meta Angaben (Titel oder Beschreibung) hinterlegt sind, werden diese anstelle der Phrasen genutzt.</helpText>
+            <defaultValue>1</defaultValue>
+        </input-field>
+
         <input-field type="textarea">
             <name>productTitlePhrases</name>
-            <label>Product Meta Title Phrases</label>
-            <label lang="de-DE">Produkt Meta Titel Phrasen</label>
+            <label>Products: Meta Title Phrases</label>
+            <label lang="de-DE">Produkte: Meta Titel Phrasen</label>
             <helpText>One phrase per line. Will be rendered as twig template.</helpText>
             <helpText lang="de-DE">Eine Phrase pro Zeile. Inhalt wird als Twig-Template gerendert.</helpText>
-            <defaultValue></defaultValue>
+            <defaultValue><![CDATA[{{ name|slice(0, 50) }} kaufen bei {{ context.salesChannel.name }}! ✓ Schneller Versand ✓ Top Kundenservice
+{{ name|slice(0, 50) }} online kaufen! ✓ Hotline ✓ Schneller Versand ✓ Top Kundenservice]]></defaultValue>
+        </input-field>
+
+        <input-field type="textarea">
+            <name>productDescriptionPhrases</name>
+            <label>Products: Meta Description Phrases</label>
+            <label lang="de-DE">Produkte: Meta Beschreibung Phrasen</label>
+            <helpText>One phrase per line. Will be rendered as twig template.</helpText>
+            <helpText lang="de-DE">Eine Phrase pro Zeile. Inhalt wird als Twig-Template gerendert.</helpText>
+            <defaultValue><![CDATA[{{ description }}]]></defaultValue>
         </input-field>
     </card>
 </config>

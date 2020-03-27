@@ -6,13 +6,12 @@
 
     <services>
         <service id="Devert\AutoMetaDetails\Helper\General">
+            <argument type="service" id="Shopware\Core\System\SystemConfig\SystemConfigService" />
+            <argument type="service" id="Shopware\Core\Framework\Adapter\Twig\StringTemplateRenderer"/>
         </service>
         <service id="Devert\AutoMetaDetails\Service\ProductPageEvent">
-            <argument type="service" id="twig" />
             <argument type="service" id="Devert\AutoMetaDetails\Helper\General" />
             <tag name="kernel.event_subscriber"/>
         </service>
-
-        
     </services>
 </container>
