@@ -2,7 +2,11 @@
 
 namespace Devert\AutoMetaDetails\Service;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
+use Shopware\Core\Framework\DataAbstractionLayer\Search\Criteria;
+use Shopware\Core\System\SalesChannel\Entity\SalesChannelRepositoryInterface;
 use Shopware\Core\System\SalesChannel\SalesChannelContext;
+use Shopware\Core\Content\Category\Exception\CategoryNotFoundException;
+use Shopware\Core\Content\Category\CategoryEntity;
 use Shopware\Storefront\Page\Navigation\NavigationPageLoadedEvent;
 use Shopware\Storefront\Page\Navigation\NavigationPage;
 use Devert\AutoMetaDetails\Helper\General;
@@ -15,19 +19,19 @@ class CategoryPageEvent implements EventSubscriberInterface
     public $helper;
 
     /**
-     * @var CategoryRouteInterface
+     * @var SalesChannelRepositoryInterface
      */
-    private $cmsPageRoute;
+    private $categoryRepository;
 
     /**
      * @var string
      */
     public $entity_name = 'category';
 
-    public function __construct(General $helper, CategoryRouteInterface $cmsPageRoute)
+    public function __construct(General $helper, SalesChannelRepositoryInterface $categoryRepository)
     {
         $this->helper = $helper;
-        $this->cmsPageRoute = $cmsPageRoute;
+        $this->categoryRepository = $categoryRepository;
     }
 
     public static function getSubscribedEvents(): array
@@ -52,9 +56,7 @@ class CategoryPageEvent implements EventSubscriberInterface
 
         //load category, because it not passed over the event
         $navigationId = $request->get('navigationId', $sales_channel_context->getSalesChannel()->getNavigationCategoryId());
-        $category = $this->cmsPageRoute
-            ->load($navigationId, $request, $sales_channel_context)
-            ->getCategory();
+        $category = $this->loadCategory($navigationId, $sales_channel_context);
 
         //change meta title
         $this->setMetaTitle($page, $context, $sales_channel_context, $request, $category);
@@ -152,4 +154,17 @@ class CategoryPageEvent implements EventSubscriberInterface
         );
     }
 
+    public function loadCategory(string $categoryId, SalesChannelContext $context): CategoryEntity
+    {
+        $criteria = new Criteria([$categoryId]);
+        $criteria->addAssociation('media');
+
+        $category = $this->categoryRepository->search($criteria, $context)->get($categoryId);
+
+        if (!$category) {
+            throw new CategoryNotFoundException($categoryId);
+        }
+
+        return $category;
+    }
 }
