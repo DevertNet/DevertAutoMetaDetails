@@ -35,6 +35,12 @@ class ProductPageEvent implements EventSubscriberInterface
         $context = $event->getContext();
         $sales_channel_context = $event->getSalesChannelContext();
 
+        //check if active
+        if(!$this->helper->getSystemConfig('DevertAutoMetaDetails.config.active'))
+        {
+            return;
+        }
+
         //change meta title
         $this->setMetaTitle($page, $context, $sales_channel_context);
 
