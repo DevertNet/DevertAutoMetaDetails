@@ -86,9 +86,6 @@ class CategoryPageEvent implements EventSubscriberInterface
             return;
         }
 
-        //var_dump($category);
-        //die;
-
         //get phrases from config
         $phrases = $this->helper->getTitlePhrases($this->entity_name, $page);
         //$phrases = array('aaas PPPPP {{ category.translated.name|slice(0, 20)|raw }} {{ context.salesChannel.name }} dasdasdasdasd');

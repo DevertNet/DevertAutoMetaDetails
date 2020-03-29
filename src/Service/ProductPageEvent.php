@@ -72,6 +72,7 @@ class ProductPageEvent implements EventSubscriberInterface
 
         //get phrases from config
         $phrases = $this->helper->getTitlePhrases($this->entity_name, $page);
+        //$phrases = array('xx {{ "detail.addProduct"|trans|sw_sanitize }} aaas {{ name|slice(0, 10) }} {{ page.product.productnumber }} {{ context.salesChannel.name }} dasdasdasdasd');
 
         //check if there are phrases
         if(!$phrases)
@@ -79,15 +80,12 @@ class ProductPageEvent implements EventSubscriberInterface
             return;
         }
 
-        //debug
-        //$phrases = array('aaas {{ name|slice(0, 10) }} {{ page.product.productnumber }} {{ context.salesChannel.name }} dasdasdasdasd');
-
         //get phrase for this product id
         $new_meta_title = $this->helper->getPhrase($phrases, $page->getProduct()->getAutoIncrement());
         
         //render meta title
         //$this->templateRenderer->enableTestMode();
-        $output = $this->helper->getTemplateRenderer()->render($new_meta_title, $this->getTemplateVariables($page, $sales_channel_context), $context);
+        $output = $this->helper->getTemplateRenderer()->render($new_meta_title, $this->getTemplateVariables($page, $sales_channel_context, $context), $context);
 
         //set meta title
         $metaInformation->setMetaTitle($output);
@@ -105,6 +103,7 @@ class ProductPageEvent implements EventSubscriberInterface
 
         //get phrases from config
         $phrases = $this->helper->getDescriptionPhrases($this->entity_name, $page);
+        //$phrases = array('aaas {{ name|slice(0, 10) }} {{ page.product.productnumber }} {{ context.salesChannel.name }} dasdasdasdasd');
 
         //check if there are phrases
         if(!$phrases)
@@ -112,15 +111,12 @@ class ProductPageEvent implements EventSubscriberInterface
             return;
         }
 
-        //debug
-        //$phrases = array('aaas {{ name|slice(0, 10) }} {{ page.product.productnumber }} {{ context.salesChannel.name }} dasdasdasdasd');
-
         //get phrase for this product id
         $new_meta_description = $this->helper->getPhrase($phrases, $page->getProduct()->getAutoIncrement());
         
         //render meta title
         //$this->templateRenderer->enableTestMode();
-        $output = $this->helper->getTemplateRenderer()->render($new_meta_description, $this->getTemplateVariables($page, $sales_channel_context), $context);
+        $output = $this->helper->getTemplateRenderer()->render($new_meta_description, $this->getTemplateVariables($page, $sales_channel_context, $context), $context);
 
         //set meta title
         if($output)
@@ -129,13 +125,39 @@ class ProductPageEvent implements EventSubscriberInterface
         }
     }
 
-    public function getTemplateVariables($page, $sales_channel_context)
+    public function getTemplateVariables($page, $sales_channel_context, $context)
     {
         return array(
             'name' => $page->getProduct()->getTranslation('name'),
             'description' => $page->getProduct()->getTranslation('description'),
+            'price' => $this->renderPrice($page, $sales_channel_context, $context),
             'page' => $page,
             'context' => $sales_channel_context,
         );
+    }
+
+    public function renderPrice($page, $sales_channel_context, $context)
+    {
+        $price_template = '{% set product = page.product %}
+        {% set purchaseUnit = product.purchaseUnit %}
+        {% set listingPrice = product.calculatedListingPrice %}
+        {% set fromPrice = listingPrice.from %}
+        {% set referncePrice = product.calculatedPrice.referencePrice %}
+        {% set listPrice = product.priceRange or product.calculatedPrices.count > 0 ? null : product.calculatedPrice.listPrice %}
+    
+        {% if product.priceRange %}
+            {{ fromPrice.unitPrice|currency }}
+            -
+            {{ listingPrice.to.unitPrice|currency }}
+        {% elseif product.calculatedPrices|length == 1 %}
+            {{ product.calculatedPrices.first.unitPrice|currency }}
+        {% else %}
+            {{ product.calculatedPrice.unitPrice|currency }}
+
+            {% if listPrice.percentage > 0 %}
+                    {{ listPrice.price|currency }}
+            {% endif %}
+        {% endif %}';
+        return $this->helper->getTemplateRenderer()->render($price_template, array('page' => $page, 'context' => $sales_channel_context), $context);
     }
 }
