@@ -2,8 +2,12 @@
 
 namespace Devert\AutoMetaDetails\Helper;
 
+use Monolog\Logger;
+use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Shopware\Core\System\SystemConfig\SystemConfigService;
 use Shopware\Core\Framework\Adapter\Twig\StringTemplateRenderer;
+use Shopware\Core\Framework\Context;
+use Devert\AutoMetaDetails\Event\LoggingEvent;
 
 class General
 {
@@ -17,10 +21,28 @@ class General
      */
     private $templateRenderer;
 
-    public function __construct(SystemConfigService $systemConfigService, StringTemplateRenderer $templateRenderer)
+    /** @var EventDispatcherInterface */
+    private $eventDispatcher;
+
+    public function __construct(SystemConfigService $systemConfigService, StringTemplateRenderer $templateRenderer, EventDispatcherInterface $eventDispatcher)
     {
         $this->systemConfigService = $systemConfigService;
         $this->templateRenderer = $templateRenderer;
+        $this->eventDispatcher = $eventDispatcher;
+    }
+
+    public function logException(
+        Context $context,
+        \Exception $exception
+    ): void {
+        $loggingEvent = new LoggingEvent(
+            $context,
+            $exception->getMessage(),
+            Logger::ERROR,
+            $exception
+        );
+
+        $this->eventDispatcher->dispatch($loggingEvent);
     }
 
     public function getSystemConfig(string $path)

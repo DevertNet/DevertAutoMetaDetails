@@ -41,11 +41,23 @@ class ProductPageEvent implements EventSubscriberInterface
             return;
         }
 
-        //change meta title
-        $this->setMetaTitle($page, $context, $sales_channel_context);
+        try {
+            //change meta title
+            $this->setMetaTitle($page, $context, $sales_channel_context);
 
-        //change meta description
-        $this->setMetaDescription($page, $context, $sales_channel_context);
+            //change meta description
+            $this->setMetaDescription($page, $context, $sales_channel_context);
+        } catch (\Throwable $th) {
+            $this->helper->logException($context, $th);
+
+            //show error message in title
+            if($this->helper->getSystemConfig('DevertAutoMetaDetails.config.debug'))
+            {
+                $metaInformation = $page->getMetaInformation();
+                $metaInformation->setMetaTitle((string) $th->getMessage());
+                $metaInformation->setMetaDescription((string) $th->getMessage());
+            }
+        }
 
         //bug fix for empty description (e.g. sw6.1.3)
         $metaInformation = $page->getMetaInformation();
@@ -73,6 +85,7 @@ class ProductPageEvent implements EventSubscriberInterface
         //get phrases from config
         $phrases = $this->helper->getTitlePhrases($this->entity_name, $page);
         //$phrases = array('xx {{ "detail.addProduct"|trans|sw_sanitize }} aaas {{ name|slice(0, 10) }} {{ page.product.productnumber }} {{ context.salesChannel.name }} dasdasdasdasd');
+        //$phrases = array('aaas {{ asdasdasdasd }} dasdasdasdasd');
 
         //check if there are phrases
         if(!$phrases)
@@ -104,6 +117,7 @@ class ProductPageEvent implements EventSubscriberInterface
         //get phrases from config
         $phrases = $this->helper->getDescriptionPhrases($this->entity_name, $page);
         //$phrases = array('aaas {{ name|slice(0, 10) }} {{ page.product.productnumber }} {{ context.salesChannel.name }} dasdasdasdasd');
+        //$phrases = array('aaas {{ asdasdasdasd }} dasdasdasdasd');
 
         //check if there are phrases
         if(!$phrases)
@@ -154,7 +168,7 @@ class ProductPageEvent implements EventSubscriberInterface
         {% else %}
             {{ product.calculatedPrice.unitPrice|currency }}
 
-            {% if listPrice.percentage > 0 %}
+            {% if listPrice and listPrice.percentage > 0 %}
                     {{ listPrice.price|currency }}
             {% endif %}
         {% endif %}';

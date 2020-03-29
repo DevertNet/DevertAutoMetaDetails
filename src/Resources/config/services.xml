@@ -8,6 +8,7 @@
         <service id="Devert\AutoMetaDetails\Helper\General">
             <argument type="service" id="Shopware\Core\System\SystemConfig\SystemConfigService" />
             <argument type="service" id="Shopware\Core\Framework\Adapter\Twig\StringTemplateRenderer"/>
+            <argument type="service" id="event_dispatcher"/>
         </service>
         <service id="Devert\AutoMetaDetails\Service\ProductPageEvent">
             <argument type="service" id="Devert\AutoMetaDetails\Helper\General" />

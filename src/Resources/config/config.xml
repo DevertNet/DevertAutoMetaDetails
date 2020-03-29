@@ -15,6 +15,15 @@
         </input-field>
 
         <input-field type="bool">
+            <name>debug</name>
+            <label>Debug (DO NOT USE IN PRODUCTIVE MODE)</label>
+            <label lang="de-DE">Aktiv (NICHT IM PRODUKTIV MODUS NUTZEN)</label>
+            <helpText>If a meta specification cannot be generated, the meta title and description is set to "ERROR: [msg]".</helpText>
+            <helpText lang="de-DE">Wenn eine Meta-Angabe nicht erzeugt werden kann, wird der Meta Titel und Beschreibung auf "ERROR: [msg]" gesetzt.</helpText>
+            <defaultValue>0</defaultValue>
+        </input-field>
+
+        <input-field type="bool">
             <name>productAllowIndividualMetaData</name>
             <label>Products: Use individual meta data, if available?</label>
             <label lang="de-DE">Produkte: Individuelle Meta Angaben nutzen, wenn gepflegt?</label>
