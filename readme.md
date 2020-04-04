@@ -16,7 +16,7 @@ The structure of the SEO meta information can be completely individual. In addit
 Because the templates are rendered as Twig-Templates, you have a lot of possibilities to specify the meta information individually.
 
 For example, a template could look like this:
-```{{ name|slice(0, 50) }} buy from {{{ context.salesChannel.name }}! ✓ Fast shipping ✓ Top customer service```
+```{{ name|slice(0, 50) }} buy from {{ context.salesChannel.name }}! ✓ Fast shipping ✓ Top customer service```
 
 ## Multiple templates
 It is possible to store several templates for categories and products. The respective template is selected automatically. For a product/category, always the same template is selected. The template changes only if the number of templates is changed.
@@ -48,7 +48,7 @@ https://twig.symfony.com/doc/2.x/filters/raw.html
 - Stock ```{{ page.product.stock }}``` ```{{ page.product.availableStock }
 - Rating as number (1-5) ```{{ page.product.ratingAverage }}```
 - Attributes ```{{ page.product.customFields.custom_shoes_quos_earum_non }}```
-- Options ```{% for option in page.selectedOptions %}{{ option.group.translated.name|e }}} {{{ option.translated.name|e }}{% endfor %}```
+- Options ```{% for option in page.selectedOptions %}{{ option.group.translated.name|e }} {{ option.translated.name|e }}{% endfor %}```
 - price ```{{ price }}```
 - For experienced users: Product Object: ```{{ page.product }}``` and Context Object: ```{{ context }}```
 
@@ -62,9 +62,9 @@ If the differentiation between individual storefronts is no longer sufficient, p
 You only need to specify the ISO code (for example, de-DE) at the beginning of the line.
 Note: Phrases without ISO code are used for all languages.
 
-```de-DE:{{ name|slice(0, 50) }} buy from {{{ context.salesChannel.name }}! ✓ Fast shipping ✓ Top customer service```
+```de-DE:{{ name|slice(0, 50) }} buy from {{ context.salesChannel.name }}! ✓ Fast shipping ✓ Top customer service```
 
-```en-GB:{{ name|slice(0, 50) }} buy from {{{ context.salesChannel.name }}! ✓ Fast shipping ✓ Top customer service```  
+```en-GB:{{ name|slice(0, 50) }} buy from {{ context.salesChannel.name }}! ✓ Fast shipping ✓ Top customer service```  
 
 ## License
 Using for private and commercial: Free
