@@ -65,3 +65,9 @@ Note: Phrases without ISO code are used for all languages.
 ```de-DE:{{ name|slice(0, 50) }} buy from {{{ context.salesChannel.name }}! ✓ Fast shipping ✓ Top customer service```
 
 ```en-GB:{{ name|slice(0, 50) }} buy from {{{ context.salesChannel.name }}! ✓ Fast shipping ✓ Top customer service```  
+
+## License
+Using for private and commercial: Free
+Copy parts of the code: Allowed
+Modify: Allowed
+Reselling: Not allowed
